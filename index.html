@@ -8,7 +8,7 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="index.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   </head>
   <body>
@@ -16,24 +16,54 @@
       <div class="form-container">
         <div class="header-box text-center">
           <h3>RK Damani Medical College</h3>
-          <p class="text-muted">External Event Participation Report Portal</p>
+          <p class="text-muted">
+            External Event Participation Report Portal (UNOFFICIAL)
+          </p>
         </div>
 
-        <div id="deadline-warning" class="alert alert-danger" style="display: none">
+        <div
+          id="deadline-warning"
+          class="alert alert-danger"
+          style="display: none"
+        >
           <strong>⚠️ Notice:</strong> More than 7 days have passed since the
-          event. Please submit immediately[cite: 9, 36].
+          event. Please submit immediately.
         </div>
 
         <form id="reportForm">
+          <div class="d-flex justify-content-end mb-3">
+            <button
+              type="button"
+              id="clearAllBtn"
+              class="btn btn-outline-danger btn-sm"
+              onclick="clearAllData()"
+              style="display: none"
+            >
+              Clear All Fields
+            </button>
+          </div>
+
           <h5 class="mb-3 text-primary">1. Basic Details</h5>
           <div class="row g-3">
             <div class="col-md-6">
               <label class="form-label">Event Name</label>
-              <input type="text" id="eventName" class="form-control" required />
+              <input
+                type="text"
+                id="eventName"
+                class="form-control"
+                oninput="saveProgress()"
+                required
+              />
             </div>
             <div class="col-md-6">
               <label class="form-label">Organizing Body</label>
-              <input type="text" id="orgBody" class="form-control" required />
+              <input
+                type="text"
+                id="orgBody"
+                class="form-control"
+                oninput="saveProgress()"
+                required
+              />
             </div>
             <div class="col-md-4">
               <label class="form-label">Date of Event</label>
@@ -41,13 +71,22 @@
                 type="date"
                 id="eventDate"
                 class="form-control"
-                onchange="checkDeadline()"
+                onchange="
+                  checkDeadline();
+                  saveProgress();
+                "
                 required
               />
             </div>
             <div class="col-md-4">
               <label class="form-label">Venue</label>
-              <input type="text" id="venue" class="form-control" required />
+              <input
+                type="text"
+                id="venue"
+                class="form-control"
+                oninput="saveProgress()"
+                required
+              />
             </div>
             <div class="col-md-4">
               <label class="form-label">Year & Course</label>
@@ -56,6 +95,7 @@
                 id="yearCourse"
                 class="form-control"
                 placeholder="(e.g., 3rd Year - MBBS)"
+                oninput="saveProgress()"
                 required
               />
             </div>
@@ -89,7 +129,8 @@
               id="objective"
               class="form-control"
               rows="2"
-              placeholder="Relevance to academics/institution [cite: 22]"
+              placeholder="Relevance to academics/institution"
+              oninput="saveProgress()"
             ></textarea>
           </div>
           <div class="mb-3">
@@ -98,7 +139,8 @@
               id="summary"
               class="form-control"
               rows="4"
-              placeholder="Events attended, roles performed [cite: 24]"
+              placeholder="Events attended, roles performed"
+              oninput="saveProgress()"
             ></textarea>
           </div>
           <div class="mb-3">
@@ -107,53 +149,71 @@
               id="achievements"
               class="form-control"
               rows="2"
-              placeholder="Awards, learnings [cite: 26]"
+              placeholder="Awards, learnings"
+              oninput="saveProgress()"
             ></textarea>
           </div>
 
           <div class="mb-3">
-            <label class="form-label"
-              >Financial Details (if applicable) [cite: 27]</label
-            >
+            <label class="form-label">Financial Details (if applicable)</label>
             <textarea
               id="financials"
               class="form-control"
               rows="2"
               placeholder="Funds utilized, receipts, etc."
+              oninput="saveProgress()"
             ></textarea>
           </div>
           <div class="mb-3">
-            <label class="form-label"
-              >Overall Experience & Learning [cite: 29]</label
-            >
+            <label class="form-label">Overall Experience & Learning</label>
             <textarea
               id="learning"
               class="form-control"
               rows="2"
               placeholder="Skills gained, academic benefit"
+              oninput="saveProgress()"
             ></textarea>
           </div>
           <div class="mb-3">
-            <label class="form-label">Suggestions/Feedback [cite: 31]</label>
+            <label class="form-label">Suggestions/Feedback</label>
             <textarea
               id="feedback"
               class="form-control"
               rows="2"
               placeholder="For future improvements"
+              oninput="saveProgress()"
             ></textarea>
           </div>
 
-          <hr class="my-4">
-<h5 class="mb-3 text-primary">3. Attachments</h5>
-<div class="mb-3">
-    <label class="form-label">Upload Proof (Certificates/Receipts/Photos)</label>
-    <div class="input-group">
-        <input type="text" id="attachmentName" class="form-control" placeholder="Name of attachment (e.g. Train Receipt)">
-        <input type="file" id="fileInput" class="form-control" accept="image/*">
-        <button type="button" class="btn btn-outline-secondary" onclick="addAttachment()">Add</button>
-    </div>
-    <div id="attachmentList" class="mt-2 text-muted small"></div>
-</div>
+          <hr class="my-4" />
+          <h5 class="mb-3 text-primary">3. Attachments</h5>
+          <div class="mb-3">
+            <label class="form-label"
+              >Upload Proof (Certificates/Receipts/Photos)</label
+            >
+            <div class="input-group">
+              <input
+                type="text"
+                id="attachmentName"
+                class="form-control"
+                placeholder="Name of attachment"
+              />
+              <input
+                type="file"
+                id="fileInput"
+                class="form-control"
+                accept="image/*"
+              />
+              <button
+                type="button"
+                class="btn btn-outline-secondary"
+                onclick="addAttachment()"
+              >
+                Add
+              </button>
+            </div>
+            <div id="attachmentList" class="mt-3"></div>
+          </div>
 
           <div class="text-center mt-5">
             <button
@@ -161,7 +221,7 @@
               class="btn btn-primary btn-lg"
               onclick="generatePDF()"
             >
-              Generate Official PDF
+              Generate PDF
             </button>
           </div>
         </form>

@@ -1,53 +1,150 @@
 :root {
-    --rkdmc-blue: #003366;
+    /* Dark Theme Colors */
+    --rkdmc-blue: #3a86ff; /* A brighter blue that pops on dark backgrounds */
+    --bg-dark: #121212;   /* Deep black/grey background */
+    --card-dark: #1e1e1e; /* Slightly lighter grey for the form container */
+    --text-main: #e0e0e0; /* Off-white for readability */
+    --border-color: #333333;
 }
 
 body {
-    background-color: #f0f2f5;
-    font-family: sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    transition: background-color 0.3s ease;
 }
 
 .form-container {
     max-width: 800px;
-    margin: auto;
-    background: white;
+    margin: 40px auto;
+    background: var(--card-dark);
     padding: 40px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    border: 1px solid var(--border-color);
+}
+
+/* Ensure inputs look good in dark mode */
+.form-control, .form-select {
+    background-color: #2b2b2b;
+    border: 1px solid var(--border-color);
+    color: white;
+}
+
+.form-control:focus {
+    background-color: #333333;
+    color: white;
+    border-color: var(--rkdmc-blue);
+    box-shadow: 0 0 0 0.25rem rgba(58, 134, 255, 0.25);
 }
 
 .header-box {
     border-bottom: 3px solid var(--rkdmc-blue);
     margin-bottom: 30px;
+    padding-bottom: 10px;
 }
 
+/* TAG SYSTEM REFINEMENTS */
 .tag-container {
-    border: 1px solid #ced4da;
+    border: 1px solid var(--border-color);
     padding: 10px;
-    border-radius: 4px;
+    border-radius: 6px;
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 6px;
     min-height: 50px;
+    background: #181818;
 }
 
 .tag {
     background: var(--rkdmc-blue);
     color: white;
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 14px;
+    padding: 4px 10px; /* Slightly smaller padding */
+    border-radius: 6px; /* Slightly more square/modern */
+    font-size: 13px;    /* Smaller font as requested */
     display: flex;
     align-items: center;
+    cursor: default;   /* Keeps the cursor steady on the tag */
+    transition: transform 0.1s ease;
+}
+
+.tag:hover {
+    filter: brightness(1.1);
 }
 
 .remove-btn {
-    margin-left: 8px;
-    cursor: pointer;
+    margin-left: 10px;
+    cursor: pointer;      /* Forced pointer for the button */
     font-weight: bold;
+    font-size: 16px;      /* Made the 'X' larger */
+    line-height: 1;
+    padding: 2px 5px;
+    border-radius: 4px;
+    background: rgba(0,0,0,0.2); /* Subtle box around the X */
+    display: inline-block;
 }
 
+.remove-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ff4d4d; /* Reddish tint on hover for delete action */
+}
+
+/* Fix for the text cursor issue */
+#nameInput {
+    cursor: text;
+}
+
+/* Adjust warning for Dark Mode */
 #deadline-warning {
-    display: none; /* This hides it by default on page load */
+    display: none;
     margin-bottom: 20px;
+    background-color: #441111; /* Dark red background */
+    border-color: #ff4d4d;
+    color: #ffcccc;
+}
+
+/* 1. Fix for the 'External Event' subtitle (.text-muted) */
+.header-box p.text-muted {
+    color: #b0b0b0 !important; /* Forces a light grey/white color */
+}
+
+/* 2. Fix for all Placeholder text (the ghost text in boxes) */
+::placeholder {
+    color: #888888 !important;
+    opacity: 1; /* Firefox requires this */
+}
+
+/* 3. Space between Attachment Name and Choose File block */
+#attachmentName {
+    margin-right: 12px; /* Adds the gap you requested */
+    border-radius: 6px !important; /* Optional: makes it look cleaner */
+}
+
+/* 4. Fix for the 'Choose File' button spacing */
+#fileInput {
+    margin-right: 12px;
+    border-radius: 6px !important;
+}
+
+/* 5. Ensure the input group doesn't squash them together */
+.input-group > .form-control {
+    flex: 1 1 auto;
+    width: 1%;
+}
+
+/* Makes the calendar icon white in dark theme */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+}
+
+/* Style for the Clear All button to make it subtle */
+#clearAllBtn {
+    opacity: 0.7;
+    font-size: 15px;
+    border-radius: 6px;
+}
+
+#clearAllBtn:hover {
+    opacity: 1;
 }

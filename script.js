@@ -55,7 +55,7 @@ function checkDeadline() {
     }
 }
 
-// --- 3. ATTACHMENT HANDLING ---
+// --- ATTACHMENT HANDLING WITH REMOVE ---
 function addAttachment() {
     const nameInput = document.getElementById('attachmentName');
     const fileInput = document.getElementById('fileInput');
@@ -66,11 +66,13 @@ function addAttachment() {
         const fileName = nameInput.value.trim() || fileInput.files[0].name;
 
         reader.onload = function(e) {
+            const id = Date.now(); // Unique ID to track for removal
             attachments.push({
+                id: id,
                 name: fileName,
                 data: e.target.result 
             });
-            list.innerHTML += `<div class="text-success small">✅ Added: ${fileName}</div>`;
+            renderAttachments();
             nameInput.value = '';
             fileInput.value = '';
         };
@@ -78,56 +80,191 @@ function addAttachment() {
     }
 }
 
+function renderAttachments() {
+    const list = document.getElementById('attachmentList');
+    list.innerHTML = '';
+    attachments.forEach((att, index) => {
+        list.innerHTML += `
+            <div class="text-success small d-flex justify-content-between align-items-center mb-1" style="background: #252525; padding: 5px 10px; border-radius: 4px;">
+                <span>✅ ${att.name}</span>
+                <span class="text-danger" style="cursor:pointer; font-weight:bold;" onclick="removeAttachment(${index})">Remove</span>
+            </div>`;
+    });
+}
+
+function removeAttachment(index) {
+    attachments.splice(index, 1);
+    renderAttachments();
+}
+
+// --- NEW: CLEAR ALL FUNCTIONALITY ---
+function clearAllData() {
+    if (confirm("Are you sure you want to clear all fields? This cannot be undone.")) {
+        // Clear LocalStorage
+        localStorage.removeItem('rkdmc_draft');
+        
+        // Reload the page to reset everything naturally
+        window.location.reload();
+    }
+}
+
+// --- NEW: TOGGLE CLEAR BUTTON VISIBILITY ---
+function toggleClearButton() {
+    const clearBtn = document.getElementById('clearAllBtn');
+    if (!clearBtn) return;
+
+    // Check if there is a saved draft in the browser's memory
+    const savedDraft = localStorage.getItem('rkdmc_draft');
+    
+    // Also check if the user has currently typed anything or added tags
+    const hasInput = document.getElementById('eventName').value.length > 0 || 
+                     document.getElementById('summary').value.length > 0 ||
+                     participants.length > 0;
+
+    // Show button if there is a saved draft OR current unsaved input
+    if (savedDraft || hasInput) {
+        clearBtn.style.display = 'block';
+    } else {
+        clearBtn.style.display = 'none';
+    }
+}
+
+// --- LOCAL "CLOUD" SAVING (Browser Storage) ---
+// Save data every time the user types
+function saveProgress() {
+    const formData = {
+        eventName: document.getElementById('eventName').value,
+        orgBody: document.getElementById('orgBody').value,
+        venue: document.getElementById('venue').value,
+        objective: document.getElementById('objective').value,
+        summary: document.getElementById('summary').value,
+        achievements: document.getElementById('achievements').value,
+        financials: document.getElementById('financials').value,
+        learning: document.getElementById('learning').value,
+        feedback: document.getElementById('feedback').value,
+        participants: participants // our global array
+    };
+    localStorage.setItem('rkdmc_draft', JSON.stringify(formData));
+
+    // Check if we should show the Clear All button
+    toggleClearButton();
+}
+
+// Ensure button visibility is checked when page loads
+window.addEventListener('load', toggleClearButton);
+
+// Load data when page opens
+window.onload = function() {
+    const savedData = localStorage.getItem('rkdmc_draft');
+    if (savedData) {
+        const data = JSON.parse(savedData);
+        document.getElementById('eventName').value = data.eventName || '';
+        document.getElementById('orgBody').value = data.orgBody || '';
+        document.getElementById('venue').value = data.venue || '';
+        document.getElementById('objective').value = data.objective || '';
+        document.getElementById('summary').value = data.summary || '';
+        document.getElementById('achievements').value = data.achievements || '';
+        document.getElementById('financials').value = data.financials || '';
+        document.getElementById('learning').value = data.learning || '';
+        document.getElementById('feedback').value = data.feedback || '';
+        participants = data.participants || [];
+        renderTags();
+    }
+};
+
+// Add "oninput" to all your textareas and inputs in HTML to trigger saveProgress()
+
 // --- 4. PDF GENERATION LOGIC ---
 async function generatePDF() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     let y = 20;
+    const bottomMargin = 275; // The "Footer" limit
 
     // College Header
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(14);
+    doc.setFontSize(16);
     doc.text("RK DAMANI MEDICAL COLLEGE", 105, y, { align: "center" });
-    y += 7;
+    y += 8; 
     doc.setFontSize(10);
     doc.text("Shri RamChandra Institutes of Medical Sciences", 105, y, { align: "center" });
-    y += 12;
-    doc.setFontSize(12);
-    doc.text("OFFICIAL EVENT PARTICIPATION REPORT", 105, y, { align: "center" });
+    y += 8;
+    doc.setFontSize(13);
+    doc.text("EVENT PARTICIPATION REPORT", 105, y, { align: "center" });
+    doc.setLineWidth(0.5);
     doc.line(20, y + 2, 190, y + 2);
     y += 15;
 
-    // Helper for sections
-    const addSection = (title, value) => {
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(11);
-        doc.text(title + ":", 20, y);
-        y += 6;
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(10);
+    // --- NEW SMART HELPER ---
+    // This function draws text line-by-line to allow page breaks mid-paragraph
+    const addSmartSection = (title, value) => {
         const text = value || "Not specified";
-        const lines = doc.splitTextToSize(text, 170);
-        doc.text(lines, 20, y);
-        y += (lines.length * 6) + 8;
         
-        if (y > 275) { doc.addPage(); y = 20; }
+        // 1. Draw Title
+        if (y + 15 > bottomMargin) { doc.addPage(); y = 20; }
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(13);
+        doc.text(title + ":", 20, y);
+        y += 7;
+
+        // 2. Draw Content Line-by-Line
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(12);
+        const lines = doc.splitTextToSize(text, 170);
+
+        lines.forEach(line => {
+            if (y > bottomMargin) {
+                doc.addPage();
+                y = 20;
+                // Optional: repeat title on next page if you want
+                doc.setFont("helvetica", "italic");
+                doc.setFontSize(10);
+                doc.text(title + " (continued...)", 20, y);
+                y += 10;
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(12);
+            }
+            doc.text(line, 20, y);
+            y += 7; // Line height
+        });
+        
+        y += 5; // Gap after section
     };
 
-    // Mapping Student Council Structure [cite: 13-32]
-    addSection("1. Event Details", 
-        `Event Name: ${document.getElementById('eventName').value}\n` +
-        `Organizing Body: ${document.getElementById('orgBody').value}\n` +
-        `Date & Venue: ${document.getElementById('eventDate').value} | ${document.getElementById('venue').value}\n` +
-        `Year/Course: ${document.getElementById('yearCourse').value}`);
+    // --- 1. BASIC DETAILS ---
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13);
+    doc.text("1. Event Details:", 20, y);
+    y += 8;
 
-    addSection("2. Names of Participants", participants.length > 0 ? participants.join(", ") : "None listed");
-    addSection("3. Objective of Participation", document.getElementById('objective').value);
-    addSection("4. Summary of Activities", document.getElementById('summary').value);
-    addSection("5. Achievements/Outcomes", document.getElementById('achievements').value);
-    addSection("6. Financial Details", document.getElementById('financials').value);
-    addSection("7. Overall Experience & Learning", document.getElementById('learning').value);
-    addSection("8. Suggestions/Feedback", document.getElementById('feedback').value);
+    doc.setFontSize(12);
+    const details = [
+        { label: "Event Name:", id: 'eventName' },
+        { label: "Organizing Body:", id: 'orgBody' },
+        { label: "Date of Event:", id: 'eventDate' },
+        { label: "Venue:", id: 'venue' },
+        { label: "Year/Course:", id: 'yearCourse' }
+    ];
 
+    details.forEach(item => {
+        const val = document.getElementById(item.id).value || "N/A";
+        doc.setFont("helvetica", "bold");
+        doc.text(item.label, 25, y);
+        doc.setFont("helvetica", "normal");
+        doc.text(val, 65, y);
+        y += 8;
+    });
+    y += 5;
+
+    // --- 2. PARTICIPANTS & CONTENT ---
+    addSmartSection("2. Names of Participants", participants.length > 0 ? participants.join(", ") : "None listed");
+    addSmartSection("3. Objective of Participation", document.getElementById('objective').value);
+    addSmartSection("4. Summary of Activities", document.getElementById('summary').value);
+    addSmartSection("5. Achievements/Outcomes", document.getElementById('achievements').value);
+    addSmartSection("6. Financial Details", document.getElementById('financials').value);
+    addSmartSection("7. Overall Experience & Learning", document.getElementById('learning').value);
+    addSmartSection("8. Suggestions/Feedback", document.getElementById('feedback').value);
+    
     // --- 5. ATTACHMENTS WITH ASPECT RATIO FIX ---
     for (const att of attachments) {
         doc.addPage();
@@ -162,9 +299,9 @@ async function generatePDF() {
     const pageCount = doc.internal.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
         doc.setPage(i);
-        doc.setFontSize(9);
+        doc.setFontSize(8);
         doc.setTextColor(150);
-        doc.text("Generated by RKDMC Student Reporting Tool", 105, 288, { align: "center" });
+        doc.text("LMFAO", 105, 288, { align: "center" });
     }
 
     doc.save(`RKDMC_Report_${document.getElementById('eventName').value || 'Event'}.pdf`);
