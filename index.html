@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RKDMC Event Reporting Portal</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  </head>
+  <body>
+    <div class="container my-5">
+      <div class="form-container">
+        <div class="header-box text-center">
+          <h3>RK Damani Medical College</h3>
+          <p class="text-muted">External Event Participation Report Portal</p>
+        </div>
+
+        <div id="deadline-warning" class="alert alert-danger" style="display: none">
+          <strong>⚠️ Notice:</strong> More than 7 days have passed since the
+          event. Please submit immediately[cite: 9, 36].
+        </div>
+
+        <form id="reportForm">
+          <h5 class="mb-3 text-primary">1. Basic Details</h5>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Event Name</label>
+              <input type="text" id="eventName" class="form-control" required />
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Organizing Body</label>
+              <input type="text" id="orgBody" class="form-control" required />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Date of Event</label>
+              <input
+                type="date"
+                id="eventDate"
+                class="form-control"
+                onchange="checkDeadline()"
+                required
+              />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Venue</label>
+              <input type="text" id="venue" class="form-control" required />
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Year & Course</label>
+              <input
+                type="text"
+                id="yearCourse"
+                class="form-control"
+                placeholder="(e.g., 3rd Year - MBBS)"
+                required
+              />
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <label class="form-label">Names of Participants</label>
+            <div class="input-group mb-2">
+              <input
+                type="text"
+                id="nameInput"
+                class="form-control"
+                placeholder="Type name and press Enter"
+              />
+              <button
+                type="button"
+                class="btn btn-dark"
+                onclick="addParticipant()"
+              >
+                Add
+              </button>
+            </div>
+            <div id="tagContainer" class="tag-container"></div>
+          </div>
+
+          <hr class="my-4" />
+          <h5 class="mb-3 text-primary">2. Report Content</h5>
+          <div class="mb-3">
+            <label class="form-label">Objective of Participation</label>
+            <textarea
+              id="objective"
+              class="form-control"
+              rows="2"
+              placeholder="Relevance to academics/institution [cite: 22]"
+            ></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Summary of Activities</label>
+            <textarea
+              id="summary"
+              class="form-control"
+              rows="4"
+              placeholder="Events attended, roles performed [cite: 24]"
+            ></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Achievements/Outcomes</label>
+            <textarea
+              id="achievements"
+              class="form-control"
+              rows="2"
+              placeholder="Awards, learnings [cite: 26]"
+            ></textarea>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label"
+              >Financial Details (if applicable) [cite: 27]</label
+            >
+            <textarea
+              id="financials"
+              class="form-control"
+              rows="2"
+              placeholder="Funds utilized, receipts, etc."
+            ></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label"
+              >Overall Experience & Learning [cite: 29]</label
+            >
+            <textarea
+              id="learning"
+              class="form-control"
+              rows="2"
+              placeholder="Skills gained, academic benefit"
+            ></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Suggestions/Feedback [cite: 31]</label>
+            <textarea
+              id="feedback"
+              class="form-control"
+              rows="2"
+              placeholder="For future improvements"
+            ></textarea>
+          </div>
+
+          <hr class="my-4">
+<h5 class="mb-3 text-primary">3. Attachments</h5>
+<div class="mb-3">
+    <label class="form-label">Upload Proof (Certificates/Receipts/Photos)</label>
+    <div class="input-group">
+        <input type="text" id="attachmentName" class="form-control" placeholder="Name of attachment (e.g. Train Receipt)">
+        <input type="file" id="fileInput" class="form-control" accept="image/*">
+        <button type="button" class="btn btn-outline-secondary" onclick="addAttachment()">Add</button>
+    </div>
+    <div id="attachmentList" class="mt-2 text-muted small"></div>
+</div>
+
+          <div class="text-center mt-5">
+            <button
+              type="button"
+              class="btn btn-primary btn-lg"
+              onclick="generatePDF()"
+            >
+              Generate Official PDF
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

@@ -1,0 +1,53 @@
+:root {
+    --rkdmc-blue: #003366;
+}
+
+body {
+    background-color: #f0f2f5;
+    font-family: sans-serif;
+}
+
+.form-container {
+    max-width: 800px;
+    margin: auto;
+    background: white;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.header-box {
+    border-bottom: 3px solid var(--rkdmc-blue);
+    margin-bottom: 30px;
+}
+
+.tag-container {
+    border: 1px solid #ced4da;
+    padding: 10px;
+    border-radius: 4px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-height: 50px;
+}
+
+.tag {
+    background: var(--rkdmc-blue);
+    color: white;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+}
+
+.remove-btn {
+    margin-left: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#deadline-warning {
+    display: none; /* This hides it by default on page load */
+    margin-bottom: 20px;
+}
