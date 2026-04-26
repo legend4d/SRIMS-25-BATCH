@@ -185,38 +185,3 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         background-position: 200% center;
     }
 }
-
-/* Fix visibility of the Privacy Note against dark background */
-.privacy-note {
-    max-width: 600px;
-    margin: 20px auto; /* Centers the whole block and adds space */
-    padding: 15px;
-    background: rgba(255, 0, 0, 0.1); /* Subtle background contrast */
-    border-radius: 8px;
-    border: 1px solid rgba(224, 15, 15, 0.3); /* Faint border */
-    text-align: center; /* Center aligns the text internally */
-}
-
-/* Forces the "muted" text to be visible (off-white) */
-.privacy-note .text-muted {
-    color: rgba(255, 255, 255, 0.7) !important; /* Visible light grey/off-white */
-    font-size: 0.8rem;
-    line-height: 1.5;
-    margin: 0; /* Resets Bootstrap margins */
-}
-
-/* Style for the padlock and "Privacy Note:" bold text */
-.privacy-note strong {
-    color: rgba(255, 255, 255, 0.9) !important; /* Brighter white for the label */
-    font-weight: 600;
-}
-
-/* Style for the highlighted <code> text */
-.privacy-note code {
-    color: rgba(222, 195, 87, 0.9) !important; /* Golden hue, looks sharp on dark themes */
-    background: rgba(0, 0, 0, 0.3) !important; /* Slight dark contrast behind code */
-    padding: 2px 5px;
-    border-radius: 4px;
-    font-family: monospace;
-    font-size: 90%;
-}
