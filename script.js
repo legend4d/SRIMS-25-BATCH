@@ -336,7 +336,7 @@ const addSmartSection = (title, value) => {
         doc.setPage(i);
         doc.setFontSize(8);
         doc.setTextColor(150);
-        doc.text("LMFAO", 105, 288, { align: "center" });
+        doc.text("", 105, 288, { align: "center" });
     }
 
     doc.save(`RKDMC_Report_${document.getElementById('eventName').value || 'Event'}.pdf`);
